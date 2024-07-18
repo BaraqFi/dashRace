@@ -1,7 +1,7 @@
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: window.innerWidth,
+    height: window.innerHeight,
     physics: {
         default: 'arcade',
         arcade: {
@@ -12,6 +12,10 @@ const config = {
         preload: preload,
         create: create,
         update: update
+    },
+    scale: {
+        mode: Phaser.Scale.RESIZE,
+        autoCenter: Phaser.Scale.CENTER_BOTH
     }
 };
 
@@ -22,13 +26,15 @@ let lanes;
 let coins;
 let score = 0;
 let scoreText;
+let mileText;
+let miles = 0;
 let currentLaneIndex;
 let isPaused = false;
-let speed = 150;
+let speed = 100;
 let pauseButton;
 let restartButton;
 let previousCoinLane;
-const maxCoins = 6;
+const maxCoins = 7;
 
 function preload() {
     this.load.image('car', 'https://labs.phaser.io/assets/sprites/car90.png');
@@ -38,25 +44,25 @@ function preload() {
 }
 
 function create() {
-    lanes = [200, 400, 600]; // Three vertical lane positions
+    lanes = [this.cameras.main.width / 4, this.cameras.main.width / 2, 3 * this.cameras.main.width / 4]; // Three vertical lane positions
 
     // Create road backgrounds
     for (let lane of lanes) {
-        this.add.rectangle(lane, 300, 150, 600, 0x333333).setOrigin(0.5, 0.5); // road color
+        this.add.rectangle(lane, this.cameras.main.height / 2, this.cameras.main.width / 3.5, this.cameras.main.height, 0x333333).setOrigin(0.5, 0.5); // road color
         for (let i = 0; i < 10; i++) {
-            this.add.rectangle(lane, i * 60, 10, 30, 0xFFFFFF).setOrigin(0.5, 0.5); // lane lines
+            this.add.rectangle(lane, i * (this.cameras.main.height / 10), 10, this.cameras.main.height / 20, 0xFFFFFF).setOrigin(0.5, 0.5); // lane lines
         }
     }
 
     currentLaneIndex = 1; // Start in the center lane
-    car = this.physics.add.sprite(lanes[currentLaneIndex], 500, 'car');
+    car = this.physics.add.sprite(lanes[currentLaneIndex], this.cameras.main.height - 100, 'car');
     car.setCollideWorldBounds(true);
     car.angle = -90; // Rotate car to face upwards
 
     coins = this.physics.add.group({
         key: 'coin',
         repeat: 3, // Initial coins
-        setXY: { x: lanes[Phaser.Math.Between(0, 2)], y: 0, stepX: 150 }
+        setXY: { x: lanes[Phaser.Math.Between(0, 2)], y: 0, stepX: this.cameras.main.width / 4 }
     });
 
     coins.children.iterate(function (coin) {
@@ -65,7 +71,8 @@ function create() {
 
     this.physics.add.overlap(car, coins, collectCoin, null, this);
 
-    scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#FFFFFF' });
+    scoreText = this.add.text(16, 50, 'Score: 0', { fontSize: '32px', fill: '#FFFFFF' }); // Adjusted y-coordinate to 50
+    mileText = this.add.text(16, 90, 'Miles: 0', { fontSize: '32px', fill: '#FFFFFF' }); // Adjusted y-coordinate to 90
 
     this.input.on('pointerdown', moveCar, this);
 
@@ -73,6 +80,14 @@ function create() {
     this.time.addEvent({
         delay: 1000, // every 1 second
         callback: spawnCoin,
+        callbackScope: this,
+        loop: true
+    });
+
+    // Add a timed event to update miles continuously
+    this.time.addEvent({
+        delay: 3000, // every 1 second
+        callback: updateMiles,
         callbackScope: this,
         loop: true
     });
@@ -91,20 +106,23 @@ function create() {
     });
 
     // Restart button logic
-    restartButton = document.getElementById('restartButton');
+    /* restartButton = document.getElementById('restartButton');
     restartButton.addEventListener('click', () => {
         this.scene.restart();
         score = 0;
+        miles = 0;
         speed = 100;
         isPaused = false;
         pauseButton.textContent = 'Pause';
-    });
+    }); */
+
+    this.scale.on('resize', resize, this);
 }
 
 function update() {
     if (!isPaused) {
         coins.children.iterate(function (coin) {
-            if (coin.y > 600) {
+            if (coin.y > game.config.height) {
                 coin.y = 0;
                 coin.x = lanes[Phaser.Math.Between(0, 2)];
             }
@@ -146,4 +164,27 @@ function collectCoin(car, coin) {
 
     // Spawn a new coin to replace the collected one
     spawnCoin();
+}
+
+function updateMiles() {
+    if (!isPaused) {
+        miles++;
+        mileText.setText('Miles: ' + miles);
+    }
+}
+
+function resize(gameSize, baseSize, displaySize, resolution) {
+    let width = gameSize.width;
+    let height = gameSize.height;
+
+    if (width === undefined) {
+        width = this.sys.game.config.width;
+    }
+    if (height === undefined) {
+        height = this.sys.game.config.height;
+    }
+
+    this.cameras.resize(width, height);
+    lanes = [width / 4, width / 2, 3 * width / 4];
+    car.setPosition(lanes[currentLaneIndex], height - 100);
 }
