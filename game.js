@@ -71,8 +71,8 @@ function create() {
 
     this.physics.add.overlap(car, coins, collectCoin, null, this);
 
-    scoreText = this.add.text(16, 50, 'Score: 0', { fontSize: '32px', fill: '#FFFFFF' }); // Adjusted y-coordinate to 50
-    mileText = this.add.text(16, 90, 'Miles: 0', { fontSize: '32px', fill: '#FFFFFF' }); // Adjusted y-coordinate to 90
+    scoreText = this.add.text(16, 50, 'Score: 0', { fontSize: '25px', fill: '#FFFFFF' }); // Adjusted y-coordinate to 50
+    mileText = this.add.text(16, 90, 'Miles: 0', { fontSize: '25px', fill: '#FFFFFF' }); // Adjusted y-coordinate to 90
 
     this.input.on('pointerdown', moveCar, this);
 
