@@ -38,7 +38,7 @@ const maxCoins = 7;
 
 function preload() {
     this.load.image('car', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmcGRCqD3eiEmbb59NSTTRBZdcqSsZyYwmT1yyQGDpGgnL');
-    this.load.image('coin', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmXaNapSDyqtG77UuHpTduFF6M8oe6h1rh6zUc7SERqPxu');;
+    this.load.image('coin', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmVkZ3kdFCdqDCLAnpALb36GsNgXoTMh2wjqY53t2V7Hg6');;
     this.load.image('road', 'https://labs.phaser.io/assets/sprites/road.png');
     this.load.image('line', 'https://labs.phaser.io/assets/sprites/line.png');
 }
