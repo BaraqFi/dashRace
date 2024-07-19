@@ -37,8 +37,8 @@ let previousCoinLane;
 const maxCoins = 7;
 
 function preload() {
-    this.load.image('car', 'https://labs.phaser.io/assets/sprites/car90.png');
-    this.load.image('coin', 'https://labs.phaser.io/assets/sprites/gold_1.png');
+    this.load.image('car', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmRJ6HESHQcgQMBiTnmoTJtsi7seh33DgasXDduWKG9pJG');
+    this.load.image('coin', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmXaNapSDyqtG77UuHpTduFF6M8oe6h1rh6zUc7SERqPxu');;
     this.load.image('road', 'https://labs.phaser.io/assets/sprites/road.png');
     this.load.image('line', 'https://labs.phaser.io/assets/sprites/line.png');
 }
@@ -57,8 +57,8 @@ function create() {
     currentLaneIndex = 1; // Start in the center lane
     car = this.physics.add.sprite(lanes[currentLaneIndex], this.cameras.main.height - 100, 'car');
     car.setCollideWorldBounds(true);
-    car.setScale(2.2); // Change the size of the car
-    car.angle = -90; // Rotate car to face upwards
+    car.setScale(1.0);
+    car.angle = 0; // Rotate car to face upwards
 
     coins = this.physics.add.group({
         key: 'coin',
@@ -68,6 +68,7 @@ function create() {
 
     coins.children.iterate(function (coin) {
         coin.setVelocityY(speed);
+        coin.setScale(3.5);
     });
 
     this.physics.add.overlap(car, coins, collectCoin, null, this);
