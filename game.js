@@ -57,6 +57,7 @@ function create() {
     currentLaneIndex = 1; // Start in the center lane
     car = this.physics.add.sprite(lanes[currentLaneIndex], this.cameras.main.height - 100, 'car');
     car.setCollideWorldBounds(true);
+    car.setScale(2.2); // Change the size of the car
     car.angle = -90; // Rotate car to face upwards
 
     coins = this.physics.add.group({
