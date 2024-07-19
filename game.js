@@ -37,7 +37,7 @@ let previousCoinLane;
 const maxCoins = 7;
 
 function preload() {
-    this.load.image('car', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmRJ6HESHQcgQMBiTnmoTJtsi7seh33DgasXDduWKG9pJG');
+    this.load.image('car', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmcGRCqD3eiEmbb59NSTTRBZdcqSsZyYwmT1yyQGDpGgnL');
     this.load.image('coin', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmXaNapSDyqtG77UuHpTduFF6M8oe6h1rh6zUc7SERqPxu');;
     this.load.image('road', 'https://labs.phaser.io/assets/sprites/road.png');
     this.load.image('line', 'https://labs.phaser.io/assets/sprites/line.png');
@@ -57,7 +57,7 @@ function create() {
     currentLaneIndex = 1; // Start in the center lane
     car = this.physics.add.sprite(lanes[currentLaneIndex], this.cameras.main.height - 100, 'car');
     car.setCollideWorldBounds(true);
-    car.setScale(0.7);
+    car.setScale(2.3);
     car.angle = 0; // Rotate car to face upwards
 
     coins = this.physics.add.group({
