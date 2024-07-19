@@ -191,3 +191,4 @@ function resize(gameSize, baseSize, displaySize, resolution) {
     lanes = [width / 4, width / 2, 3 * width / 4];
     car.setPosition(lanes[currentLaneIndex], height - 100);
 }
+
