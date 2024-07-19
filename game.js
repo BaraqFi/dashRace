@@ -57,7 +57,7 @@ function create() {
     currentLaneIndex = 1; // Start in the center lane
     car = this.physics.add.sprite(lanes[currentLaneIndex], this.cameras.main.height - 100, 'car');
     car.setCollideWorldBounds(true);
-    car.setScale(2.3);
+    car.setScale(1.6);
     car.angle = 0; // Rotate car to face upwards
 
     coins = this.physics.add.group({
@@ -68,7 +68,7 @@ function create() {
 
     coins.children.iterate(function (coin) {
         coin.setVelocityY(speed);
-        coin.setScale(2.2);
+        coin.setScale(1.7);
     });
 
     this.physics.add.overlap(car, coins, collectCoin, null, this);
@@ -155,7 +155,7 @@ function spawnCoin() {
 
         const coin = coins.create(lanes[newLane], 0, 'coin');
         coin.setVelocityY(speed);
-        coin.setScale(2.2);
+        coin.setScale(1.7);
     }
 }
 
