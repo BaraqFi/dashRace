@@ -45,7 +45,7 @@ function preload() {
     this.load.image('coin', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmVkZ3kdFCdqDCLAnpALb36GsNgXoTMh2wjqY53t2V7Hg6');
     this.load.image('road', 'https://labs.phaser.io/assets/sprites/road.png');
     this.load.image('line', 'https://labs.phaser.io/assets/sprites/line.png');
-    this.load.image('obstacle', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmdXBp6zTCbeLcwkuaKj6tP3tWiLa5NBMt37JyuZwqKcNd'); // Replace with your obstacle image URL
+    this.load.image('obstacle', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmQMbdhVunxZ58Fdk4cZUEqEuW927baGMAzZvN3szsk1u5'); // Replace with your obstacle image URL
 }
 
 function create() {
@@ -62,7 +62,7 @@ function create() {
     currentLaneIndex = 1; // Start in the center lane
     car = this.physics.add.sprite(lanes[currentLaneIndex], this.cameras.main.height - 100, 'car');
     car.setCollideWorldBounds(true);
-    car.setScale(2.3);
+    car.setScale(1.8);
     car.angle = 0; // Rotate car to face upwards
 
     coins = this.physics.add.group({
@@ -73,7 +73,7 @@ function create() {
 
     coins.children.iterate(function (coin) {
         coin.setVelocityY(speed);
-        coin.setScale(2.2);
+        coin.setScale(1.8);
     });
 
     this.physics.add.overlap(car, coins, collectCoin, null, this);
@@ -180,7 +180,7 @@ function spawnCoin() {
 
         const coin = coins.create(lanes[newLane], 0, 'coin');
         coin.setVelocityY(speed);
-        coin.setScale(2.2);
+        coin.setScale(1.8);
     }
 }
 
