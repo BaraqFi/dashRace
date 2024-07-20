@@ -212,6 +212,9 @@ function hitObstacle(car, obstacle) {
     obstacle.disableBody(true, true);
 
     score -= 30;
+    if (score < 0) {
+    score = 0;
+    }
     scoreText.setText('Score: ' + score);
 
     // Optionally spawn a new obstacle to replace the hit one
