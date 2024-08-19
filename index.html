@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2D Racing Game</title>
+    <title>DASH RACE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
@@ -12,7 +13,7 @@
             align-items: center;
             height: 100vh;
             background-color: #87CEEB;
-            font-family: Arial, sans-serif;
+            font-family: 'Orbitron', sans-serif;
         }
         canvas {
             display: block;
@@ -27,6 +28,7 @@
             color: white;
             border: none;
             border-radius: 5px;
+            font-family: 'Press Start 2P', sans-serif;
         }
         #pauseButton {
             right: 10px;
@@ -34,12 +36,17 @@
         #restartButton {
             right: 100px;
         }
+        .gameText {
+            font-family: 'VT323', sans-serif;
+            font-size: 25px;
+            fill: '#FFFFFF';
+        }
     </style>
 </head>
 <body>
     <button id="pauseButton">Pause</button>
-    <!-- <button id="restartButton">Restart</button> -->
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
     <script src="game.js"></script>
+    <script src="sounds.js"></script>
 </body>
 </html>
