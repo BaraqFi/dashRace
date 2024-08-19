@@ -41,7 +41,7 @@ const maxCoins = 7;
 const maxObstacles = 3;
 
 function preload() {
-    this.load.image('car', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmcGRCqD3eiEmbb59NSTTRBZdcqSsZyYwmT1yyQGDpGgnL');
+    this.load.image('car', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmdU36cFQvdmpzuQ8aPVc8ehk35mNoVJqccMTqDAvQj8ZP');
     this.load.image('coin', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmVkZ3kdFCdqDCLAnpALb36GsNgXoTMh2wjqY53t2V7Hg6');
     this.load.image('road', 'https://labs.phaser.io/assets/sprites/road.png');
     this.load.image('line', 'https://labs.phaser.io/assets/sprites/line.png');
@@ -62,7 +62,7 @@ function create() {
     currentLaneIndex = 1; // Start in the center lane
     car = this.physics.add.sprite(lanes[currentLaneIndex], this.cameras.main.height - 100, 'car');
     car.setCollideWorldBounds(true);
-    car.setScale(1.35);
+    car.setScale(0.38);
     car.angle = 0; // Rotate car to face upwards
 
     coins = this.physics.add.group({
