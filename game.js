@@ -25,49 +25,55 @@ let car;
 let lanes;
 let coins;
 let obstacles;
+let missiles;
 let score = 0;
 let scoreText;
 let mileText;
 let miles = 0;
+let level = 1;
+let levelText;
 let currentLaneIndex;
 let isPaused = false;
 let speed = 100;
 let obstacleSpeed = 50;
+let missileSpeed = 150;
 let pauseButton;
 let restartButton;
 let previousCoinLane;
 let previousObstacleLane;
 const maxCoins = 7;
 const maxObstacles = 3;
+const maxMissiles = 1;
+const levelThresholds = [50, 100, 150, 200]; // Levels based on miles
 
 function preload() {
     this.load.image('car', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmdU36cFQvdmpzuQ8aPVc8ehk35mNoVJqccMTqDAvQj8ZP');
     this.load.image('coin', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmVkZ3kdFCdqDCLAnpALb36GsNgXoTMh2wjqY53t2V7Hg6');
     this.load.image('road', 'https://labs.phaser.io/assets/sprites/road.png');
     this.load.image('line', 'https://labs.phaser.io/assets/sprites/line.png');
-    this.load.image('obstacle', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmQMbdhVunxZ58Fdk4cZUEqEuW927baGMAzZvN3szsk1u5'); // Replace with your obstacle image URL
+    this.load.image('obstacle', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmQMbdhVunxZ58Fdk4cZUEqEuW927baGMAzZvN3szsk1u5');
+    this.load.image('missile', 'https://labs.phaser.io/assets/sprites/bullet.png'); // Example missile image
 }
 
 function create() {
-    lanes = [this.cameras.main.width / 4, this.cameras.main.width / 2, 3 * this.cameras.main.width / 4]; // Three vertical lane positions
+    lanes = [this.cameras.main.width / 4, this.cameras.main.width / 2, 3 * this.cameras.main.width / 4];
 
-    // Create road backgrounds
     for (let lane of lanes) {
-        this.add.rectangle(lane, this.cameras.main.height / 2, this.cameras.main.width / 3.5, this.cameras.main.height, 0x333333).setOrigin(0.5, 0.5); // road color
+        this.add.rectangle(lane, this.cameras.main.height / 2, this.cameras.main.width / 3.5, this.cameras.main.height, 0x333333).setOrigin(0.5, 0.5);
         for (let i = 0; i < 10; i++) {
-            this.add.rectangle(lane, i * (this.cameras.main.height / 10), 10, this.cameras.main.height / 20, 0xFFFFFF).setOrigin(0.5, 0.5); // lane lines
+            this.add.rectangle(lane, i * (this.cameras.main.height / 10), 10, this.cameras.main.height / 20, 0xFFFFFF).setOrigin(0.5, 0.5);
         }
     }
 
-    currentLaneIndex = 1; // Start in the center lane
+    currentLaneIndex = 1;
     car = this.physics.add.sprite(lanes[currentLaneIndex], this.cameras.main.height - 100, 'car');
     car.setCollideWorldBounds(true);
     car.setScale(0.18);
-    car.angle = 0; // Rotate car to face upwards
+    car.angle = 0;
 
     coins = this.physics.add.group({
         key: 'coin',
-        repeat: 3, // Initial coins
+        repeat: 3,
         setXY: { x: lanes[Phaser.Math.Between(0, 2)], y: 0, stepX: this.cameras.main.width / 4 }
     });
 
@@ -79,39 +85,45 @@ function create() {
     this.physics.add.overlap(car, coins, collectCoin, null, this);
 
     obstacles = this.physics.add.group();
-
     this.physics.add.overlap(car, obstacles, hitObstacle, null, this);
 
-    scoreText = this.add.text(16, 50, 'Score: 0', { fontSize: '25px', fill: '#FFFFFF' }); // Adjusted y-coordinate to 50
-    mileText = this.add.text(16, 90, 'Miles: 0', { fontSize: '25px', fill: '#FFFFFF' }); // Adjusted y-coordinate to 90
+    missiles = this.physics.add.group();
+    this.physics.add.overlap(car, missiles, hitMissile, null, this);
+
+    scoreText = this.add.text(16, 50, 'Score: 0', { fontSize: '25px', fill: '#FFFFFF' });
+    mileText = this.add.text(16, 90, 'Miles: 0', { fontSize: '25px', fill: '#FFFFFF' });
+    levelText = this.add.text(16, 130, 'Level: 1', { fontSize: '25px', fill: '#FFFFFF' });
 
     this.input.on('pointerdown', moveCar, this);
 
-    // Add a timed event to spawn coins continuously
     this.time.addEvent({
-        delay: 1000, // every 1 second
+        delay: 1000,
         callback: spawnCoin,
         callbackScope: this,
         loop: true
     });
 
-    // Add a timed event to spawn obstacles continuously
     this.time.addEvent({
-        delay: 5000, // every 5 seconds
+        delay: 5000,
         callback: spawnObstacle,
         callbackScope: this,
         loop: true
     });
 
-    // Add a timed event to update miles continuously
     this.time.addEvent({
-        delay: 3000, // every 3 seconds
+        delay: 3000,
         callback: updateMiles,
         callbackScope: this,
         loop: true
     });
 
-    // Pause button logic
+    this.time.addEvent({
+        delay: 10000,
+        callback: spawnMissile,
+        callbackScope: this,
+        loop: true
+    });
+
     pauseButton = document.getElementById('pauseButton');
     pauseButton.addEventListener('click', () => {
         isPaused = !isPaused;
@@ -123,17 +135,6 @@ function create() {
             pauseButton.textContent = 'Pause';
         }
     });
-
-    // Restart button logic
-    /* restartButton = document.getElementById('restartButton');
-    restartButton.addEventListener('click', () => {
-        this.scene.restart();
-        score = 0;
-        miles = 0;
-        speed = 100;
-        isPaused = false;
-        pauseButton.textContent = 'Pause';
-    }); */
 
     this.scale.on('resize', resize, this);
 }
@@ -154,15 +155,21 @@ function update() {
             }
         });
 
-        // Increase speed progressively
+        missiles.children.iterate(function (missile) {
+            if (missile.y > game.config.height) {
+                missile.destroy();
+            }
+        });
+
         speed += 0.01;
         coins.setVelocityY(speed);
         obstacles.setVelocityY(speed);
+        missiles.setVelocityY(missileSpeed);
     }
 }
 
 function moveCar(pointer) {
-    if (pointer.x < car.x && currentLaneIndex > 0) {
+    if (!isPaused && pointer.x < car.x && currentLaneIndex > 0) {
         currentLaneIndex--;
     } else if (pointer.x > car.x && currentLaneIndex < 2) {
         currentLaneIndex++;
@@ -198,13 +205,21 @@ function spawnObstacle() {
     }
 }
 
+function spawnMissile() {
+    if (!isPaused && missiles.countActive(true) < maxMissiles) {
+        const missileLane = Phaser.Math.Between(0, 2);
+        const missile = missiles.create(lanes[missileLane], 0, 'missile');
+        missile.setVelocityY(missileSpeed);
+        missile.setScale(0.5);
+    }
+}
+
 function collectCoin(car, coin) {
     coin.disableBody(true, true);
 
     score += 10;
     scoreText.setText('Score: ' + score);
 
-    // Spawn a new coin to replace the collected one
     spawnCoin();
 }
 
@@ -213,19 +228,40 @@ function hitObstacle(car, obstacle) {
 
     score -= 30;
     if (score < 0) {
-    score = 0;
+        score = 0;
     }
     scoreText.setText('Score: ' + score);
 
-    // Optionally spawn a new obstacle to replace the hit one
     spawnObstacle();
+}
+
+function hitMissile(car, missile) {
+    missile.disableBody(true, true);
+
+    score -= 60;
+    if (score < 0) {
+        score = 0;
+    }
+    scoreText.setText('Score: ' + score);
 }
 
 function updateMiles() {
     if (!isPaused) {
         miles++;
         mileText.setText('Miles: ' + miles);
+
+        if (miles >= levelThresholds[level - 1]) {
+            level++;
+            increaseDifficulty();
+            levelText.setText('Level: ' + level);
+        }
     }
+}
+
+function increaseDifficulty() {
+    speed += 20;
+    obstacleSpeed += 10;
+    missileSpeed += 20;
 }
 
 function resize(gameSize, baseSize, displaySize, resolution) {
