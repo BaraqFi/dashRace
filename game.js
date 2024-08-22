@@ -1,3 +1,9 @@
+if (window.Telegram && window.Telegram.WebApp) {
+    const tg = window.Telegram.WebApp;
+    tg.ready();  // Indicate that the web app is ready
+    tg.expand(); // Request to expand the mini app to full size
+}
+
 const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
