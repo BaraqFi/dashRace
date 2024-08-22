@@ -168,6 +168,7 @@ function update() {
         });
 
         speed += 0.02;
+        obstacleSpeed += 0.02;
         coins.setVelocityY(speed);
         obstacles.setVelocityY(obstacleSpeed);
         missiles.setVelocityY(missileSpeed);
