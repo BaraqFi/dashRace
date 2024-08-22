@@ -177,68 +177,87 @@ function moveCar(pointer) {
     car.x = lanes[currentLaneIndex];
 }
 
+function isOverlapping(group, x, y) {
+    let overlapping = false;
+    group.children.iterate(function (child) {
+        if (child.active && Phaser.Math.Distance.Between(child.x, child.y, x, y) < 100) { // Adjust the distance as needed
+            overlapping = true;
+        }
+    });
+    return overlapping;
+}
+
 function spawnCoin() {
     if (!isPaused && coins.countActive(true) < maxCoins) {
         let newLane;
+        let attempts = 0;
         do {
             newLane = Phaser.Math.Between(0, 2);
-        } while (newLane === previousCoinLane);
+            attempts++;
+        } while ((newLane === previousCoinLane || isOverlapping(coins, lanes[newLane], 0)) && attempts < 10);
         previousCoinLane = newLane;
 
-        const coin = coins.create(lanes[newLane], 0, 'coin');
-        coin.setVelocityY(speed);
-        coin.setScale(1.5);
+        if (attempts < 10) { // Only spawn if no overlap after a reasonable number of attempts
+            const coin = coins.create(lanes[newLane], 0, 'coin');
+            coin.setVelocityY(speed);
+            coin.setScale(1.5);
+        }
     }
 }
 
 function spawnObstacle() {
     if (!isPaused && obstacles.countActive(true) < maxObstacles) {
         let newLane;
+        let attempts = 0;
         do {
             newLane = Phaser.Math.Between(0, 2);
-        } while (newLane === previousObstacleLane);
+            attempts++;
+        } while ((newLane === previousObstacleLane || isOverlapping(obstacles, lanes[newLane], 0)) && attempts < 10);
         previousObstacleLane = newLane;
 
-        const obstacle = obstacles.create(lanes[newLane], 0, 'obstacle');
-        obstacle.setVelocityY(obstacleSpeed);
-        obstacle.setScale(0.7);
+        if (attempts < 10) { // Only spawn if no overlap after a reasonable number of attempts
+            const obstacle = obstacles.create(lanes[newLane], 0, 'obstacle');
+            obstacle.setVelocityY(obstacleSpeed);
+            obstacle.setScale(0.7);
+        }
     }
 }
 
 function spawnMissile() {
     if (!isPaused && missiles.countActive(true) < maxMissiles) {
-        const missileLane = Phaser.Math.Between(0, 2);
-        const missile = missiles.create(lanes[missileLane], 0, 'missile');
-        missile.setVelocityY(missileSpeed);
-        missile.setScale(0.2);
-        missile.angle = 180;
+        let newLane;
+        let attempts = 0;
+        do {
+            newLane = Phaser.Math.Between(0, 2);
+            attempts++;
+        } while (isOverlapping(missiles, lanes[newLane], 0) && attempts < 10);
+
+        if (attempts < 10) { // Only spawn if no overlap after a reasonable number of attempts
+            const missile = missiles.create(lanes[newLane], 0, 'missile');
+            missile.setVelocityY(missileSpeed);
+            missile.setScale(0.2);
+            missile.angle = 180;
+        }
     }
 }
 
 function collectCoin(car, coin) {
     coin.disableBody(true, true);
-
     score += 10;
     scoreText.setText('Score: ' + score);
-
-    spawnCoin();
 }
 
 function hitObstacle(car, obstacle) {
     obstacle.disableBody(true, true);
-
     score -= 30;
     if (score < 0) {
         score = 0;
     }
     scoreText.setText('Score: ' + score);
-
-    spawnObstacle();
 }
 
 function hitMissile(car, missile) {
     missile.disableBody(true, true);
-
     score -= 60;
     if (score < 0) {
         score = 0;
@@ -248,35 +267,42 @@ function hitMissile(car, missile) {
 
 function updateMiles() {
     if (!isPaused) {
-        miles++;
+        miles += 1;
         mileText.setText('Miles: ' + miles);
 
-        if (miles >= levelThresholds[level - 1]) {
+        if (level < levelThresholds.length && miles >= levelThresholds[level - 1]) {
             level++;
-            increaseDifficulty();
             levelText.setText('Level: ' + level);
+            speed += 20;
+            obstacleSpeed += 10;
+            missileSpeed += 20;
         }
     }
 }
 
-function increaseDifficulty() {
-    speed += 20;
-    obstacleSpeed += 10;
-    missileSpeed += 20;
-}
-
 function resize(gameSize, baseSize, displaySize, resolution) {
-    let width = gameSize.width;
-    let height = gameSize.height;
+    const width = gameSize.width;
+    const height = gameSize.height;
 
-    if (width === undefined) {
-        width = this.sys.game.config.width;
-    }
-    if (height === undefined) {
-        height = this.sys.game.config.height;
-    }
+    if (width === undefined) { return; }
 
-    this.cameras.resize(width, height);
-    lanes = [width / 4, width / 2, 3 * width / 4];
-    car.setPosition(lanes[currentLaneIndex], height - 100);
+    game.scale.resize(width, height);
+
+    coins.children.iterate(function (coin) {
+        coin.y = (coin.y / baseSize.height) * height;
+        coin.x = lanes[Phaser.Math.Between(0, 2)];
+    });
+
+    obstacles.children.iterate(function (obstacle) {
+        obstacle.y = (obstacle.y / baseSize.height) * height;
+        obstacle.x = lanes[Phaser.Math.Between(0, 2)];
+    });
+
+    missiles.children.iterate(function (missile) {
+        missile.y = (missile.y / baseSize.height) * height;
+        missile.x = lanes[Phaser.Math.Between(0, 2)];
+    });
+
+    car.y = (car.y / baseSize.height) * height;
+    car.x = lanes[currentLaneIndex];
 }
