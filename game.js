@@ -36,7 +36,7 @@ let currentLaneIndex;
 let isPaused = false;
 let speed = 100;
 let obstacleSpeed = 50;
-let missileSpeed = 100;
+let missileSpeed = 200;
 let pauseButton;
 let restartButton;
 let previousCoinLane;
@@ -44,7 +44,7 @@ let previousObstacleLane;
 const maxCoins = 7;
 const maxObstacles = 3;
 const maxMissiles = 1;
-const levelThresholds = [50, 100, 150, 200]; // Levels based on miles
+const levelThresholds = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500]; // Levels based on miles
 
 function preload() {
     this.load.image('car', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmdU36cFQvdmpzuQ8aPVc8ehk35mNoVJqccMTqDAvQj8ZP');
@@ -161,7 +161,7 @@ function update() {
             }
         });
 
-        speed += 0.01;
+        speed += 0.02;
         coins.setVelocityY(speed);
         obstacles.setVelocityY(speed);
         missiles.setVelocityY(missileSpeed);
