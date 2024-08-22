@@ -34,9 +34,9 @@ let level = 1;
 let levelText;
 let currentLaneIndex;
 let isPaused = false;
-let speed = 100;
-let obstacleSpeed = 50;
-let missileSpeed = 200;
+let speed = 70;
+let obstacleSpeed = 100;
+let missileSpeed = 290;
 let pauseButton;
 let restartButton;
 let previousCoinLane;
@@ -118,7 +118,7 @@ function create() {
     });
 
     this.time.addEvent({
-        delay: 10000,
+        delay: 25000,
         callback: spawnMissile,
         callbackScope: this,
         loop: true
@@ -163,7 +163,7 @@ function update() {
 
         speed += 0.02;
         coins.setVelocityY(speed);
-        obstacles.setVelocityY(speed);
+        obstacles.setVelocityY(obstacleSpeed);
         missiles.setVelocityY(missileSpeed);
     }
 }
