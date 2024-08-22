@@ -36,7 +36,7 @@ let currentLaneIndex;
 let isPaused = false;
 let speed = 100;
 let obstacleSpeed = 50;
-let missileSpeed = 150;
+let missileSpeed = 100;
 let pauseButton;
 let restartButton;
 let previousCoinLane;
@@ -52,7 +52,7 @@ function preload() {
     this.load.image('road', 'https://labs.phaser.io/assets/sprites/road.png');
     this.load.image('line', 'https://labs.phaser.io/assets/sprites/line.png');
     this.load.image('obstacle', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmQMbdhVunxZ58Fdk4cZUEqEuW927baGMAzZvN3szsk1u5');
-    this.load.image('missile', 'https://labs.phaser.io/assets/sprites/bullet.png'); // Example missile image
+    this.load.image('missile', 'https://amethyst-near-cobra-868.mypinata.cloud/ipfs/QmT23AdgtfuCEbQ7cGmxfPLHdvcDALG3QKPPobzsoh8pTy'); // Example missile image
 }
 
 function create() {
@@ -210,7 +210,8 @@ function spawnMissile() {
         const missileLane = Phaser.Math.Between(0, 2);
         const missile = missiles.create(lanes[missileLane], 0, 'missile');
         missile.setVelocityY(missileSpeed);
-        missile.setScale(0.5);
+        missile.setScale(0.2);
+        missile.angle = 180;
     }
 }
 
