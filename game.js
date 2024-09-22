@@ -1,36 +1,3 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getDatabase, ref, set, get } from "firebase/database";
-import { getAuth, signInAnonymously } from "firebase/auth";
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAz5S15rWdy3AClE-uPJU3qrJreMmRyqwI",
-  authDomain: "dashrace-ac2ef.firebaseapp.com",
-  projectId: "dashrace-ac2ef",
-  storageBucket: "dashrace-ac2ef.appspot.com",
-  messagingSenderId: "992917114200",
-  appId: "1:992917114200:web:3e593969e62de015f5692d",
-  measurementId: "G-RZG8P67HKG"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getDatabase(app);
-const auth = getAuth();
-
-signInAnonymously(auth)
-  .then(() => {
-    // Signed in..
-    console.log("Signed in anonymously");
-  })
-  .catch((error) => {
-    console.error("Anonymous auth error:", error);
-  });
-
 if (window.Telegram && window.Telegram.WebApp) {
     const tg = window.Telegram.WebApp;
     tg.ready();  // Indicate that the web app is ready
@@ -176,20 +143,6 @@ function create() {
     });
 
     this.scale.on('resize', resize, this);
-
-    // Retrieve latest values from database
-    const userId = auth.currentUser.uid;
-    get(ref(db, 'gameState/' + userId)).then((snapshot) => {
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            score = data.score || 0;
-            miles = data.miles || 0;
-            level = data.level || 1;
-            updateScoreText();
-            updateMileText();
-            updateLevelText();
-        }
-    });
 }
 
 function update() {
@@ -298,59 +251,40 @@ function spawnMissile() {
 function collectCoin(car, coin) {
     coin.disableBody(true, true);
     score += 10;
-    updateScoreText();
-    updateDatabase();
+    scoreText.setText('Score: ' + score);
 }
 
 function hitObstacle(car, obstacle) {
     obstacle.disableBody(true, true);
-    score = Math.max(0, score - 30);
-    updateScoreText();
-    updateDatabase();
+    score -= 30;
+    if (score < 0) {
+        score = 0;
+    }
+    scoreText.setText('Score: ' + score);
 }
 
 function hitMissile(car, missile) {
     missile.disableBody(true, true);
-    score = Math.max(0, score - 60);
-    updateScoreText();
-    updateDatabase();
+    score -= 60;
+    if (score < 0) {
+        score = 0;
+    }
+    scoreText.setText('Score: ' + score);
 }
 
 function updateMiles() {
     if (!isPaused) {
         miles += 1;
-        updateMileText();
-        
+        mileText.setText('Miles: ' + miles);
+
         if (level < levelThresholds.length && miles >= levelThresholds[level - 1]) {
             level++;
-            updateLevelText();
+            levelText.setText('Level: ' + level);
             speed += 20;
             obstacleSpeed += 10;
             missileSpeed += 20;
         }
-        updateDatabase();
     }
-}
-
-function updateScoreText() {
-    scoreText.setText('Score: ' + score);
-}
-
-function updateMileText() {
-    mileText.setText('Miles: ' + miles);
-}
-
-function updateLevelText() {
-    levelText.setText('Level: ' + level);
-}
-
-function updateDatabase() {
-    const userId = auth.currentUser.uid;
-    set(ref(db, 'gameState/' + userId), {
-        score: score,
-        miles: miles,
-        level: level
-    });
 }
 
 function resize(gameSize, baseSize, displaySize, resolution) {
